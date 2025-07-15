@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="fa">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>تحلیل عاطفی ترس</title>
+  <style>
+    body {
+      direction: rtl;
+      font-family: Tahoma, sans-serif;
+      background-color: #595178;
+      color: #fff;
+      max-width: 640px;
+      margin: auto;
+      padding: 30px 20px;
+    }
+    h2 {
+      text-align: center;
+      color: #bd00c4;
+      margin-bottom: 30px;
+    }
+    #question {
+      font-size: 20px;
+      margin-bottom: 30px;
+      min-height: 70px;
+    }
+    button {
+      font-size: 18px;
+      padding: 12px 20px;
+      margin: 10px 5px;
+      border-radius: 10px;
+      border: none;
+      cursor: pointer;
+      background-color: #C8B2D8;
+      color: #3E3A55;
+      transition: background-color 0.3s ease;
+    }
+    button:hover {
+      background-color: #267acc;
+    }
+    #result, #final {
+      background-color: #3e2a57;
+      padding: 20px;
+      margin-top: 20px;
+      border-radius: 12px;
+      display: none;
+      white-space: pre-wrap;
+    }
+    #continueBtn {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+
+  <img src="https://cdn.imgurl.ir/uploads/v8855_.jpg" alt="لوگوی بازی" style="width: 250px; display: block; margin: 0 auto 20px;" />
+  <div id="question"></div>
+
+  <button id="yesBtn">بله</button>
+  <button id="noBtn">خیر</button>
+  <button id="continueBtn">ادامه</button>
+
+  <div id="result"></div>
+  <div id="final"></div>
+
+  <script>
+    const steps = [
+      {
+        text: "🔷 1. آیا خطر واقعی و بیرونی وجود دارد؟",
+        yes: 1,
+        no: 4
+      },
+      {
+        text: "🔷 2. آیا می‌تونم اقدامی برای محافظت از خودم انجام بدم؟",
+        yes: "🧪 معجون فوری:\n▪ اقدام کن\n▪ تنفس عمیق\n▪ یادداشت چیزی که نجاتت داد\n\n➡️ پایان",
+        no: 2
+      },
+      {
+        text: "🔷 3. آیا می‌تونی احساس امن درونی بسازی؟ (مثل نشستن کنار دیوار، لمس قلب...)",
+        yes: "🧪 تمرین امنیت:\n▪ لمس بدن، موسیقی، نور کم، پتو\n▪ بنویس که الان امنی\n\n➡️ بعداً بررسی کن چطور محیطت رو امن‌تر کنی",
+        no: "🆘 معجون فوری:\n▪ تماس با دوست/مشاور\n▪ تمرکز روی حس پاها و نفس\n\n💬 پیام: «همین الان امن بودن، اولویت توئه»"
+      },
+      {
+        text: "", yes: "", no: ""  // خالی برای شمارش
+      },
+      {
+        text: "🔷 4. آیا ترس مربوط به آینده‌ی ناشناخته است؟",
+        yes: 5,
+        no: 7
+      },
+      {
+        text: "🔷 5. آیا این سناریو واقعاً الان اتفاق افتاده؟",
+        yes: 0,
+        no: 6
+      },
+      {
+        text: "🔷 6. آیا من کنترل یا تأثیر بر این موضوع دارم؟",
+        yes: "🧠 پیام:\n▪ ترس پیش‌بینی‌گره نه دشمن\n▪ چای گرم + نوشتن ۳ قدم ممکن\n\n⏹ پایان",
+        no: "🧘 پذیرش + مراقبت:\n▪ جمله «من در لحظه‌ی حال امنم» روی دستت بنویس\n▪ نفس عمیق، آغوش خودت\n\n⏹ پایان"
+      },
+      {
+        text: "🔷 7. آیا ترس، مربوط به تجربه‌ی قدیمیه؟ (خاطره‌ی دردناک؟)",
+        yes: "💧 ترس فعال‌شده:\n▪ لمس سینه، گفتن «الان فرق داره»\n▪ صدای دلگرم‌کننده‌ی ضبط‌شده از خودت\n⏹ پایان",
+        no: "🌀 ترس پراکنده:\n▪ رقص، لرزش بدن، نوشتار آزاد\n▪ معجون: آهنگ ضرب‌دار + لرزش حیوان‌گونه\n⏹ پایان"
+      }
+    ];
+
+    let currentStep = 0;
+    let pendingMessage = null;
+
+    const questionEl = document.getElementById("question");
+    const resultEl = document.getElementById("result");
+    const finalEl = document.getElementById("final");
+    const yesBtn = document.getElementById("yesBtn");
+    const noBtn = document.getElementById("noBtn");
+    const continueBtn = document.getElementById("continueBtn");
+
+    function showQuestion(index) {
+      const step = steps[index];
+      if (!step || step.text === "") return;
+      questionEl.textContent = step.text;
+      resultEl.style.display = "none";
+      continueBtn.style.display = "none";
+      yesBtn.style.display = "inline-block";
+      noBtn.style.display = "inline-block";
+      questionEl.style.display = "block";
+      finalEl.style.display = "none";
+    }
+
+    function showResult(message) {
+      resultEl.textContent = message;
+      resultEl.style.display = "block";
+      yesBtn.style.display = "none";
+      noBtn.style.display = "none";
+      continueBtn.style.display = "inline-block";
+    }
+
+    function showFinal(message) {
+      questionEl.style.display = "none";
+      yesBtn.style.display = "none";
+      noBtn.style.display = "none";
+      continueBtn.style.display = "none";
+      resultEl.style.display = "none";
+      finalEl.textContent = message;
+      finalEl.style.display = "block";
+    }
+
+    yesBtn.onclick = () => {
+      const step = steps[currentStep];
+      if (typeof step.yes === "number") {
+        currentStep = step.yes;
+        showQuestion(currentStep);
+      } else {
+        pendingMessage = step.yes;
+        showResult(pendingMessage);
+      }
+    };
+
+    noBtn.onclick = () => {
+      const step = steps[currentStep];
+      if (typeof step.no === "number") {
+        currentStep = step.no;
+        showQuestion(currentStep);
+      } else {
+        pendingMessage = step.no;
+        showResult(pendingMessage);
+      }
+    };
+
+    continueBtn.onclick = () => {
+      showFinal(pendingMessage + "\n\n🔚 در پایان مسیر:\nتو یا ترست کم شده، یا به امنیت نزدیک شدی، یا فهمیدی از چی می‌ترسی 💙");
+    };
+
+    showQuestion(currentStep);
+  </script>
+
+</body>
+</html>

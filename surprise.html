@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="fa">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>تحلیل خودتحلیلی تعجب</title>
+  <style>
+    body {
+      direction: rtl;
+      font-family: Tahoma, sans-serif;
+      background-color: #E1D7F0; /* نارنجی بسیار روشن */
+      color: #2e1a00; /* قهوه‌ای سوخته برای متن */
+      max-width: 600px;
+      margin: 30px auto;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 0 15px rgba(255, 140, 0, 0.3);
+    }
+    h2 {
+      text-align: center;
+      color: #ff6f00; /* نارنجی پررنگ */
+      margin-bottom: 30px;
+      font-weight: bold;
+    }
+    #question {
+      font-size: 20px;
+      margin-bottom: 30px;
+      min-height: 80px;
+      font-weight: 600;
+    }
+    button {
+      font-size: 18px;
+      padding: 12px 22px;
+      margin: 10px 8px;
+      border-radius: 10px;
+      border: none;
+      cursor: pointer;
+      font-weight: 700;
+      background-color: #DE593D; /* نارنجی */
+      color: #403E63;
+      transition: background-color 0.3s ease;
+      min-width: 110px;
+      box-shadow: 0 3px 7px rgba(255, 152, 0, 0.5);
+    }
+    button:hover {
+      background-color: #ef6c00; /* نارنجی تیره‌تر */
+    }
+    #result, #final {
+      background-color: #ffe0b2; /* نارنجی بسیار روشن‌تر */
+      color: #4e342e; /* قهوه‌ای تیره */
+      padding: 20px;
+      margin-top: 25px;
+      border-radius: 14px;
+      white-space: pre-wrap;
+      display: none;
+      font-size: 18px;
+      font-weight: 500;
+      line-height: 1.5;
+      box-shadow: 0 0 10px rgba(255, 152, 0, 0.3);
+    }
+    #continueBtn {
+      display: none;
+      background-color: #ffb74d;
+      color: #3e2723;
+      width: 100%;
+      margin-top: 25px;
+      font-weight: 700;
+      box-shadow: 0 3px 8px rgba(255, 183, 77, 0.6);
+    }
+  </style>
+</head>
+<body>
+
+  <img src="https://cdn.imgurl.ir/uploads/c24039_.jpg" alt="لوگوی بازی" style="width: 250px; display: block; margin: 0 auto 20px;" /><div id="question"></div>
+
+  <button id="yesBtn">بله</button>
+  <button id="noBtn">خیر</button>
+  <button id="continueBtn">ادامه</button>
+
+  <div id="result"></div>
+  <div id="final"></div>
+
+  <script>
+    const steps = [
+      {
+        text: "🔸 1. آیا اتفاقی ناگهانی افتاده که انتظارش رو نداشتم؟",
+        yes: 1,
+        no: "ممکنه احساس دیگه‌ای داری (مثلاً سردرگمی، شک)"
+      },
+      {
+        text: "🔸 2. آیا این اتفاق \"خطرناک\" یا \"ناامن\" بود؟",
+        yes: "⚠️ تعجب منجر به ترس\n→ احساس اصلی = ترس\n🧪 معجون: تنفس عمیق + بررسی امنیت فیزیکی + یادداشت محرک\n⏹ پایان",
+        no: 2
+      },
+      {
+        text: "🔸 3. آیا این اتفاق \"خوشحال‌کننده\" یا \"لذت‌بخش\" بود؟",
+        yes: "🎉 تعجب منجر به شادی\n→ احساس اصلی = شادی\n🧪 معجون: لبخند، ثبت لحظه، اشتراک با دیگران\n⏹ پایان",
+        no: 3
+      },
+      {
+        text: "🔸 4. آیا این اتفاق \"عجیب\"، \"خنده‌دار\" یا \"پوچ\" بود؟",
+        yes: "😅 تعجب منجر به طنز یا سردرگمی\n→ احساس اصلی = کنجکاوی یا شوخ‌طبعی\n🧪 معجون: بازتاب فکری یا نوشتن برداشت اول\n⏹ پایان",
+        no: 4
+      },
+      {
+        text: "🔸 5. آیا این اتفاق \"مبهم\" یا \"غیرقابل درک\" بود؟",
+        yes: "🌀 تعجب منجر به شک یا حیرت فکری\n→ احساس اصلی = عدم اطمینان یا نیاز به تحلیل\n🧪 معجون: گفت‌وگو با یک نفر، نوشتن چرایی\n⏹ پایان",
+        no: "تعجب ممکنه پوششی برای احساسی دیگه باشه (مثل خشم یا ناامیدی)\n\n💬 خروجی نهایی:\nتعجب خودش موندگار نیست، ولی مثل دروازه‌ایه که تو رو به احساس بعدی هدایت می‌کنه.\n\nتو فقط باید بفهمی:\n\nاین تعجب منو به کجا برد؟\n\nو چی توی وجودم روشن شد؟"
+      }
+    ];
+
+    let currentStep = 0;
+    let pendingMessage = null;
+
+    const questionEl = document.getElementById("question");
+    const resultEl = document.getElementById("result");
+    const finalEl = document.getElementById("final");
+    const yesBtn = document.getElementById("yesBtn");
+    const noBtn = document.getElementById("noBtn");
+    const continueBtn = document.getElementById("continueBtn");
+
+    function showQuestion(index) {
+      const step = steps[index];
+      if (!step) return;
+      questionEl.textContent = step.text;
+      resultEl.style.display = "none";
+      finalEl.style.display = "none";
+      continueBtn.style.display = "none";
+      yesBtn.style.display = "inline-block";
+      noBtn.style.display = "inline-block";
+      questionEl.style.display = "block";
+    }
+
+    function showResult(message) {
+      resultEl.textContent = message;
+      resultEl.style.display = "block";
+      yesBtn.style.display = "none";
+      noBtn.style.display = "none";
+      continueBtn.style.display = "inline-block";
+    }
+
+    function showFinal(message) {
+      questionEl.style.display = "none";
+      yesBtn.style.display = "none";
+      noBtn.style.display = "none";
+      continueBtn.style.display = "none";
+      resultEl.style.display = "none";
+      finalEl.textContent = message;
+      finalEl.style.display = "block";
+    }
+
+    yesBtn.onclick = () => {
+      const step = steps[currentStep];
+      if (typeof step.yes === "number") {
+        currentStep = step.yes;
+        showQuestion(currentStep);
+      } else {
+        pendingMessage = step.yes;
+        showResult(pendingMessage);
+      }
+    };
+
+    noBtn.onclick = () => {
+      const step = steps[currentStep];
+      if (typeof step.no === "number") {
+        currentStep = step.no;
+        showQuestion(currentStep);
+      } else {
+        pendingMessage = step.no;
+        showResult(pendingMessage);
+      }
+    };
+
+    continueBtn.onclick = () => {
+      showFinal(pendingMessage);
+    };
+
+    showQuestion(currentStep);
+  </script>
+
+</body>
+</html>

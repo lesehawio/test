@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="fa">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>تحلیل خودآگاه خشم</title>
+  <style>
+    body {
+      direction: rtl;
+      font-family: Tahoma, sans-serif;
+      background-color: #FF9F41;
+      color: #111;
+      max-width: 600px;
+      margin: auto;
+      padding: 30px 20px;
+    }
+
+    h2 {
+      text-align: center;
+      color: #990000;
+      margin-bottom: 30px;
+    }
+
+    #question {
+      font-size: 20px;
+      margin-bottom: 30px;
+      min-height: 70px;
+    }
+
+    button {
+      font-size: 18px;
+      padding: 12px 20px;
+      margin: 10px;
+      border-radius: 10px;
+      border: none;
+      cursor: pointer;
+      background-color: #EF541C;
+      color: #A83525;
+      transition: background-color 0.3s ease;
+    }
+
+    button:hover {
+      background-color: #e60000;
+    }
+
+    #result {
+      background-color: #fff0f0;
+      padding: 20px;
+      margin-top: 20px;
+      border-radius: 12px;
+      display: none;
+      white-space: pre-wrap;
+    }
+
+    #continueBtn {
+      display: none;
+    }
+
+    #final {
+      background-color: #fbeaea;
+      color: #000;
+      padding: 20px;
+      margin-top: 30px;
+      border: 2px dashed #ff9999;
+      border-radius: 12px;
+      font-size: 18px;
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <img src="https://cdn.imgurl.ir/uploads/s51194_.jpg" alt="لوگوی بازی" style="width: 250px; display: block; margin: 0 auto 20px;" />
+  <div id="question"></div>
+
+  <button id="yesBtn">بله</button>
+  <button id="noBtn">خیر</button>
+  <button id="continueBtn">ادامه</button>
+
+  <div id="result"></div>
+  <div id="final"></div>
+
+  <script>
+    const steps = [
+      {
+        text: "❓ آیا الان در خطر فوری یا حمله قرار دارم؟",
+        yes: "⚠️ فوراً از خودت محافظت کن، دور شو یا کمک بگیر",
+        no: {
+          message: "🧩 راهکار:\n▪ به خودت بگو: «الان امنم، فقط احساس دارم نه تهدید واقعی»\n▪ ۵ نفس عمیق با بازدم طولانی بکش (۴ ثانیه دم، ۸ ثانیه بازدم)\n▪ از محل فعلی کمی فاصله بگیر حتی برای ۲ دقیقه",
+        }
+      },
+      {
+        text: "❓ آیا مرزم زیر پا گذاشته شده؟ (احترام، وقت، بدن، فضا...)", 
+        yes: 2,
+        no: {
+          message: "🧩 راهکار:\n▪ شاید علت خشم چیز دیگه‌ایه: خستگی؟ شرم؟ حسادتی سرکوب‌شده؟\n▪ بنویس یا ضبط کن: «چی ممکنه پشت این خشم باشه؟»\n▪ بپرس: «من الان واقعاً از چی می‌ترسم یا ناراحتم؟»",
+        }
+      },
+      {
+        text: "❓ آیا قبلاً سعی کردم این مرز رو بدون خشونت بیان کنم؟",
+        yes: "done",
+        no: {
+          message: "🧩 راهکار:\n▪ جمله تمرینی: «وقتی این اتفاق افتاد، من احساس (مثلاً تحقیر) کردم. می‌خوام از این به بعد (خواسته‌ت رو بگو).»\n▪ یا بنویسش اول برای خودت، بعد آروم و واضح بگو",
+        }
+      }
+    ];
+
+    const finalMessage = `✅ 🎯 نتیجه: خشم تو یک پیام درست داره — حالا می‌تونی با قدرت و بدون خشونت از خودت دفاع کنی
+
+→ از صدات استفاده کن، اما بدون فریاد  
+→ از بدنت استفاده کن، اما بدون خشونت  
+→ و از مرزت دفاع کن، نه از غرورت`;
+
+    let currentStep = 0;
+
+    const questionEl = document.getElementById("question");
+    const resultEl = document.getElementById("result");
+    const finalEl = document.getElementById("final");
+    const yesBtn = document.getElementById("yesBtn");
+    const noBtn = document.getElementById("noBtn");
+    const continueBtn = document.getElementById("continueBtn");
+
+    function showQuestion(stepIndex) {
+      const step = steps[stepIndex];
+      questionEl.textContent = step.text;
+      resultEl.style.display = "none";
+      continueBtn.style.display = "none";
+      yesBtn.style.display = "inline-block";
+      noBtn.style.display = "inline-block";
+      finalEl.style.display = "none";
+    }
+
+    yesBtn.onclick = () => {
+      const step = steps[currentStep];
+      if (step.yes === "done") {
+        showFinalResult();
+      } else if (typeof step.yes === "string") {
+        questionEl.style.display = "none";
+        yesBtn.style.display = "none";
+        noBtn.style.display = "none";
+        resultEl.textContent = step.yes;
+        resultEl.style.display = "block";
+        continueBtn.style.display = "none";
+      } else {
+        currentStep = step.yes;
+        showQuestion(currentStep);
+      }
+    };
+
+    noBtn.onclick = () => {
+      const step = steps[currentStep];
+      resultEl.textContent = step.no.message;
+      resultEl.style.display = "block";
+      yesBtn.style.display = "none";
+      noBtn.style.display = "none";
+      continueBtn.style.display = "inline-block";
+    };
+
+    continueBtn.onclick = () => {
+      currentStep++;
+      if (currentStep < steps.length) {
+        showQuestion(currentStep);
+      } else {
+        showFinalResult();
+      }
+    };
+
+    function showFinalResult() {
+      yesBtn.style.display = "none";
+      noBtn.style.display = "none";
+      continueBtn.style.display = "none";
+      questionEl.style.display = "none";
+      resultEl.style.display = "none";
+      finalEl.textContent = finalMessage;
+      finalEl.style.display = "block";
+    }
+
+    // شروع اولیه
+    showQuestion(currentStep);
+  </script>
+
+</body>
+</html>

@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="fa">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>تحلیل عاطفی غم</title>
+  <style>
+    body {
+      direction: rtl;
+      font-family: Tahoma, sans-serif;
+      background-color: #C7C6E5; /* آبی تیره */
+      color: #ffffff;
+      max-width: 640px;
+      margin: auto;
+      padding: 30px 20px;
+    }
+
+    h2 {
+      text-align: center;
+      color: #66b3ff;
+      margin-bottom: 30px;
+    }
+
+    #question {
+      font-size: 20px;
+      margin-bottom: 30px;
+      min-height: 70px;
+    }
+
+    button {
+      font-size: 18px;
+      padding: 12px 20px;
+      margin: 10px 5px;
+      border-radius: 10px;
+      border: none;
+      cursor: pointer;
+      background-color: #565B93;
+      color: #fff;
+      transition: background-color 0.3s ease;
+    }
+
+    button:hover {
+      background-color: #267acc;
+    }
+
+    #result {
+      background-color: #2a3f5f;
+      padding: 20px;
+      margin-top: 20px;
+      border-radius: 12px;
+      display: none;
+      white-space: pre-wrap;
+    }
+
+    #continueBtn {
+      display: none;
+    }
+
+    #final {
+      background-color: #224466;
+      color: #ffffff;
+      padding: 20px;
+      margin-top: 30px;
+      border: 2px dashed #66b3ff;
+      border-radius: 12px;
+      font-size: 18px;
+      display: none;
+    }
+  </style>
+</head>
+<body>
+
+  <img src="https://cdn.imgurl.ir/uploads/k16987_.jpg" alt="لوگوی بازی" style="width: 250px; display: block; margin: 0 auto 20px;" />
+  <div id="question"></div>
+
+  <button id="yesBtn">بله</button>
+  <button id="noBtn">خیر</button>
+  <button id="continueBtn">ادامه</button>
+
+  <div id="result"></div>
+  <div id="final"></div>
+
+  <script>
+    const steps = [
+      {
+        text: "🔸 آیا چیزی را از دست داده‌ام؟",
+        yes: 1,
+        no: 5
+      },
+      {
+        text: "🔹 آیا آن چیز برایم مهم بود؟",
+        yes: 2,
+        no: 4
+      },
+      {
+        text: "🔸 آیا فرصتی برای خداحافظی، عزاداری، یا پذیرش داشتم؟",
+        yes: "⚫ پذیرش سوگ\n\n✅ غم فعالِ سالم (آزادسازی عاطفی)\n\n➡️ معجون جایگزین (نوشتار، صدا، لمس)",
+        no: "🟠 غم سرکوب‌شده\n\n▪ نوشتن، گریه، صحبت با یک دوست یا مشاور\n\n→ بعد از تخلیه: غم سالم و سبک‌تر می‌شه\n\n➡️ معجون جایگزین (مثل نوشتار درمانی یا آغوش امن)"
+      },
+      {
+        text: "", // فقط برای شمارش در گام 4
+        yes: "",
+        no: ""
+      },
+      {
+        text: "✅ غم کوچکی داشتی، اما چون خیلی برات مهم نبود، خودت رو به آرومی نوازش کن و عبور کن.",
+        done: true
+      },
+      {
+        text: "🔸 آیا نیازم نادیده گرفته شده؟ (مثل عشق، درک، توجه، امنیت)",
+        yes: 6,
+        no: 8
+      },
+      {
+        text: "🔹 آیا احساس تنهایی یا طرد شدگی دارم؟",
+        yes: 7,
+        no: 8
+      },
+      {
+        text: "⚫ غم از نیاز برآورده‌نشده\n\n▪ بازنگری مرزها یا درخواست واضح‌تر از دیگران\n▪ با کسی حرف بزن یا بنویس\n\n➡️ اقدام به تأمین تدریجی نیازت",
+        done: true
+      },
+      {
+        text: "✅ در حال حاضر غم فعال نیست یا ریشه مشخصی نداره.\n\n🟦 فقط با یک مراقبت ساده مثل چای، قدم زدن یا آغوش خودت رو تغذیه کن.",
+        done: true
+      }
+    ];
+
+    let currentStep = 0;
+    let pendingMessage = null;
+
+    const questionEl = document.getElementById("question");
+    const resultEl = document.getElementById("result");
+    const finalEl = document.getElementById("final");
+    const yesBtn = document.getElementById("yesBtn");
+    const noBtn = document.getElementById("noBtn");
+    const continueBtn = document.getElementById("continueBtn");
+
+    function showQuestion(index) {
+      const step = steps[index];
+      if (step.done) {
+        showFinal(step.text);
+        return;
+      }
+      questionEl.textContent = step.text;
+      resultEl.style.display = "none";
+      continueBtn.style.display = "none";
+      yesBtn.style.display = "inline-block";
+      noBtn.style.display = "inline-block";
+      questionEl.style.display = "block";
+      finalEl.style.display = "none";
+    }
+
+    function showResult(message) {
+      resultEl.textContent = message;
+      resultEl.style.display = "block";
+      yesBtn.style.display = "none";
+      noBtn.style.display = "none";
+      continueBtn.style.display = "inline-block";
+    }
+
+    function showFinal(message) {
+      questionEl.style.display = "none";
+      yesBtn.style.display = "none";
+      noBtn.style.display = "none";
+      continueBtn.style.display = "none";
+      resultEl.style.display = "none";
+      finalEl.textContent = message;
+      finalEl.style.display = "block";
+    }
+
+    yesBtn.onclick = () => {
+      const step = steps[currentStep];
+      if (typeof step.yes === "number") {
+        currentStep = step.yes;
+        showQuestion(currentStep);
+      } else {
+        pendingMessage = step.yes;
+        showResult(pendingMessage);
+      }
+    };
+
+    noBtn.onclick = () => {
+      const step = steps[currentStep];
+      if (typeof step.no === "number") {
+        currentStep = step.no;
+        showQuestion(currentStep);
+      } else {
+        pendingMessage = step.no;
+        showResult(pendingMessage);
+      }
+    };
+
+    continueBtn.onclick = () => {
+      showFinal(pendingMessage);
+    };
+
+    showQuestion(currentStep);
+  </script>
+
+</body>
+</html>

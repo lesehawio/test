@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="fa">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>تحلیل تنفر</title>
+  <style>
+    body {
+      direction: rtl;
+      font-family: Tahoma, sans-serif;
+      background-color: #AFB49D; /* سبز تیره خاکی */
+      color: #f0fff0;
+      max-width: 640px;
+      margin: auto;
+      padding: 30px 20px;
+    }
+
+    h2 {
+      text-align: center;
+      color: #a8d5a2;
+      margin-bottom: 30px;
+    }
+
+    #question {
+      font-size: 20px;
+      margin-bottom: 30px;
+      min-height: 70px;
+    }
+
+    button {
+      font-size: 18px;
+      padding: 12px 20px;
+      margin: 10px 5px;
+      border-radius: 10px;
+      border: none;
+      cursor: pointer;
+      background-color: #677B58; /* سبز خاکی روشن */
+      color: #465946;
+      transition: background-color 0.3s ease;
+    }
+
+    button:hover {
+      background-color: #3d573c;
+    }
+
+    #result, #final {
+      background-color: #2d402c; /* سبز ملایم‌تر */
+      padding: 20px;
+      margin-top: 20px;
+      border-radius: 12px;
+      display: none;
+      white-space: pre-wrap;
+    }
+
+    #continueBtn {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+
+  <img src="https://cdn.imgurl.ir/uploads/s21497_.jpg" alt="لوگوی بازی" style="width: 250px; display: block; margin: 0 auto 20px;" />
+  <div id="question"></div>
+
+  <button id="yesBtn">بله</button>
+  <button id="noBtn">خیر</button>
+  <button id="continueBtn">ادامه</button>
+
+  <div id="result"></div>
+  <div id="final"></div>
+
+  <script>
+    const steps = [
+      {
+        text: "🔸 1. آیا از یک فرد/رفتار/شرایط به‌شدت دوری می‌کنی یا بیزاری؟",
+        yes: 1,
+        no: "شاید این احساس تنفر نیست — برو سراغ احساس خشم، ترس یا اندوه"
+      },
+      {
+        text: "🔸 2. آیا این تنفر تازه است یا قدیمی و تکرارشونده؟",
+        yes: 2, // تازه → 3
+        no: 4   // قدیمی → 5
+      },
+      {
+        text: "🔸 3. آیا این فرد/رفتار به مرزهای تو آسیب زده؟",
+        yes: "🔥 تنفر محافظتی فعال شده:\n🛡️ اقدام کن: تعیین فاصله یا حتی قطع ارتباط\n🧪 معجون: نامه‌ی ناخوانده، رقص تخلیه، حرکات خشم آرام\n⏹ پایان",
+        no: 3 // بررسی حسی بودن
+      },
+      {
+        text: "🔸 4. آیا این فقط واکنش بدنی/زیباشناختی است؟ (مثلاً بو، صدا...)",
+        yes: "💡 تنفر حسی:\n🧪 معجون: دوری، تنفس، موسیقی خنثی\n⏹ پایان",
+        no: 5 // شاید منتقل‌شده
+      },
+      {
+        text: "🔸 5. آیا این فرد یا وضعیت یادآور آزار قبلی است؟",
+        yes: "🧠 تنفر شرطی‌شده:\n🧪 معجون: نوشتن خاطره‌ی اصلی + نوازش کودک درون\n💬 جمله: «اون موقع بی‌دفاع بودم، حالا نه»\n⏹ پایان",
+        no: 6
+      },
+      {
+        text: "🔸 6. آیا تنفر تو از خودته؟ (شرم، بدن، صدای درونی...)",
+        yes: "💔 تنفر درونی‌شده:\n🧪 تمرین آینه، گفت‌وگوی درونی، آغوش خود\n🌿 تمرین بخشایش درونی\n⏹ پایان",
+        no: 7
+      },
+      {
+        text: "🔸 7. آیا این تنفر جمعی یا آموخته‌شده است؟ (از فرهنگ، خانواده؟)",
+        yes: "🔎 تنفر فرهنگی/اجتماعی:\n🧪 معجون: مستند، مطالعه زاویه‌ی مقابل\n📚 تمرین بازسازی تصویر ذهنی\n⏹ پایان",
+        no: "شاید نیاز به بررسی‌های عمیق‌تر داری — دفتر احساسات، گفت‌وگو، مشاوره"
+      }
+    ];
+
+    let currentStep = 0;
+    let pendingMessage = null;
+
+    const questionEl = document.getElementById("question");
+    const resultEl = document.getElementById("result");
+    const finalEl = document.getElementById("final");
+    const yesBtn = document.getElementById("yesBtn");
+    const noBtn = document.getElementById("noBtn");
+    const continueBtn = document.getElementById("continueBtn");
+
+    function showQuestion(index) {
+      const step = steps[index];
+      if (!step || typeof step.text !== "string") return;
+      questionEl.textContent = step.text;
+      resultEl.style.display = "none";
+      continueBtn.style.display = "none";
+      yesBtn.style.display = "inline-block";
+      noBtn.style.display = "inline-block";
+      questionEl.style.display = "block";
+      finalEl.style.display = "none";
+    }
+
+    function showResult(message) {
+      resultEl.textContent = message;
+      resultEl.style.display = "block";
+      yesBtn.style.display = "none";
+      noBtn.style.display = "none";
+      continueBtn.style.display = "inline-block";
+    }
+
+    function showFinal(message) {
+      questionEl.style.display = "none";
+      yesBtn.style.display = "none";
+      noBtn.style.display = "none";
+      continueBtn.style.display = "none";
+      resultEl.style.display = "none";
+      finalEl.textContent = message + "\n\n⛩️ پایان مسیر:\nتنفر تو قابل درکه — اما تو می‌تونی اون رو به مرز سالم یا رهایی تبدیل کنی.";
+      finalEl.style.display = "block";
+    }
+
+    yesBtn.onclick = () => {
+      const step = steps[currentStep];
+      if (typeof step.yes === "number") {
+        currentStep = step.yes;
+        showQuestion(currentStep);
+      } else {
+        pendingMessage = step.yes;
+        showResult(pendingMessage);
+      }
+    };
+
+    noBtn.onclick = () => {
+      const step = steps[currentStep];
+      if (typeof step.no === "number") {
+        currentStep = step.no;
+        showQuestion(currentStep);
+      } else {
+        pendingMessage = step.no;
+        showResult(pendingMessage);
+      }
+    };
+
+    continueBtn.onclick = () => {
+      showFinal(pendingMessage);
+    };
+
+    showQuestion(currentStep);
+  </script>
+
+</body>
+</html>
